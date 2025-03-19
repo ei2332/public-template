@@ -1,0 +1,97 @@
+template <typename T>
+struct seg {
+    vector<T> data;
+    int size, log, _n;
+    T syoki;
+    function<T(T, T)> f;
+
+    seg(int n, const function<T(T, T)>& F, T s = 0) : f(F), syoki(s) {
+        size = 1, log = 0, _n = n;
+        while (size < n) size <<= 1, log++;
+        data.assign(2 * size, syoki);
+    }
+
+    seg(const vector<T>& x, const function<T(T, T)>& F, T s = 0) : f(F), syoki(s) {
+        int n = x.size();
+        size = 1, log = 0, _n = n;
+        while (size < n) size <<= 1, log++;
+        data.assign(2 * size, syoki);
+        for (int i = 0; i < n; i++) data[size + i] = x[i];
+        for (int i = size - 1; i >= 1; i--) update(i);
+    }
+
+    void update(int x) {
+        if (x >= size) return;
+        data[x] = f(data[2 * x], data[2 * x + 1]);
+    }
+
+    T query(int l, int r) {
+        T sml = syoki, smr = syoki;
+        for (l += size, r += size; l < r; l >>= 1, r >>= 1) {
+            if (l & 1) sml = f(sml, data[l++]);  // 計算後、lを1加算
+            if (r & 1) smr = f(data[--r], smr);  // 計算前、rを1減算
+        }
+        return f(sml, smr);
+    }
+
+    void set(int k, T x) {
+        k += size;
+        data[k] = x;
+        for (int i = 1; i <= log; i++) update(k >> i);
+    }
+
+    inline T& operator[](int k) { return data[k + size]; }
+
+    // F(f(a[l],a[l+1]...a[r-1])) = trueとなる最大のrを返す
+    int max_right(int l, const function<bool(T)>& F) {
+        if (l == _n) return size;
+        l += size;
+        T sm = syoki;
+        do {
+            while (l & 1 == 0) l >>= 1;
+            if (!F(f(sm, data[l]))) {
+                while (l < size) {
+                    l >>= 1;
+                    if (F(f(sm, data[l]))) {
+                        sm = f(sm, data[l]);
+                        l++;
+                    }
+                }
+                return l - size;
+            }
+            sm = f(sm, data[l]);
+            l++;
+        } while ((l & -l) != l);
+        return _n;
+    }
+    // F(f(a[l],a[l+1]...a[r-1])) = trueとなる最小のlを返す
+    int min_left(int r, const function<bool(T)>& F) {
+        if (r == 0) return 0;
+        r += size;
+        T sm = syoki;
+        do {
+            r--;
+            while (r > 1 && (r & 1)) r >> 1;
+            if (!F(f(data[r], sm))) {
+                while (r < size) {
+                    r = (2 * r + 1);
+                    if (F(f(data[r], sm))) {
+                        sm = f(data[r], sm);
+                        r--;
+                    }
+                }
+                return r + 1 - size;
+            }
+            sm = f(data[r], sm);
+        } while ((r & -r) != r);
+        return 0;
+    }
+
+    void print(const function<void(T)>& F, int s = 1, int k = 1, int d = 0) {
+        if (k >= 2 * size) return;
+        print(F, s, 2 * k, d + 1);
+        for (int i = 0; i < d * s; i++) cout << " ";
+        F(data[k]);
+        print(F, s, 2 * k + 1, d + 1);
+    }
+};

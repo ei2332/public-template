@@ -1,0 +1,44 @@
+struct GridBFS {
+    vector<vector<int>> prevAns;
+    vector<string> Map;
+    int height, width;
+    GridBFS(int h, int w, const vector<string>& m) : prevAns(h, vector<int>(w, -1)), height(h), width(w) {
+        Map.resize(h);
+        for (int i = 0; i < h; i++) Map[i] = m[i];
+    }
+    void calc(int startX, int startY) {
+        queue<pair<int, int>> q;
+        q.push({startX, startY});
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                prevAns[i][j] = -1;
+            }
+        }
+        prevAns[startX][startY] = 0;
+        while (!q.empty()) {
+            auto z = q.front();
+            int x = z.first;
+            int y = z.second;
+            q.pop();
+            static const vector<pair<int, int>> pos = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+            for (int i = 0; i < pos.size(); i++) {
+                int dx = x + pos[i].first;
+                int dy = y + pos[i].second;
+                if (0 <= dx && dx < height && 0 <= dy && dy < width && Map[dx][dy] != '#' && prevAns[dx][dy] == -1) {
+                    prevAns[dx][dy] = prevAns[x][y] + 1;
+                    q.push({dx, dy});
+                }
+            }
+        }
+    }
+    int getAns(int x, int y) { return prevAns[x][y]; }
+    void print() {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                cout << prevAns[i][j] << " ";
+            }
+            cout << "\n";
+        }
+        cout << "\n";
+    }
+};

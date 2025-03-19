@@ -1,0 +1,12 @@
+//乱数生成機の取得
+    random_device rd;
+    mt19937 gen(rd());
+    //distrib -> 0 ~ n-1までの正規分布
+    uniform_int_distribution<> distrib(0, n - 1);
+    //distribの実数版
+    uniform_real_distribution<double> prob(0.0, 1.0);
+    //乱数を取得
+    distrib(gen);
+    prob(gen);
+    //配列をシャッフル
+    shuffle(begin(x), end(x), gen);

@@ -1,0 +1,11 @@
+#include <bits/stdc++.h>
+
+#define int long long
+#define uint unsigned long long
+using namespace std;
+signed main() {
+    cin.tie(nullptr);
+    ios::sync_with_stdio(false);
+    cout << std::fixed << std::setprecision(10);
+    
+}

@@ -1,0 +1,68 @@
+template<int mod>
+class Mod{
+	int x;
+public:
+	Mod():x(0){}
+	Mod(int y):x((y%mod+mod)%mod){}
+	Mod &operator+=(Mod p){
+		if((x += p.x) >= mod)x -= mod;
+		return *this;
+	}
+	Mod &operator-=(Mod p){
+		if((x += mod-p.x) >= mod)x -= mod;
+		return *this;
+	}
+	Mod &operator*=(Mod p){
+		x = (x*p.x)%mod;
+		return *this;
+	}
+	Mod &operator/=(Mod p){
+		x = (x*p.inv().x)%mod;
+		return *this;
+	}
+	Mod &operator=(Mod p){
+		x = p.x;
+		return *this;
+	}
+	Mod operator-(){return Mod(-x);}
+	Mod operator+(Mod p){return Mod(x)+=p;}
+	Mod operator-(Mod p){return Mod(x)-=p;}
+	Mod operator*(Mod p){return Mod(x)*=p;}
+	Mod operator/(Mod p){return Mod(x)/=p;}
+	bool operator==(Mod p){return x == p.x;}
+	bool operator!=(Mod p){return x != p.x;}
+	bool operator<(Mod p){return x < p.x;}
+	bool operator>(Mod p){return x > p.x;}
+	bool operator<=(Mod p){return x <= p.x;}
+	bool operator>=(Mod p){return x >= p.x;}
+	//拡張ユークリッド互除法
+	Mod inv(){
+		int a = x, b = mod, u = 1, v = 0, t;
+		while(b > 0) {
+			t = a / b;
+			swap(a -= t * b, b);
+			swap(u -= t * v, v);
+		}
+		u %= mod;
+		return Mod(u<0?u+mod:u);
+	}
+	Mod pow(int n){
+		Mod ret(1),mul(x);
+		while(n > 0){
+			if(n&1)ret *= mul;
+			mul *= mul;
+			n>>=1;
+		}
+		return ret;
+	}
+	friend istream& operator>>(istream& is,Mod& x){
+		long long a;
+		cin >>a;
+		x.x = Mod(a).x;
+		return is;
+	}
+	friend ostream& operator<<(ostream& os,Mod& x){
+		os <<x.x;
+		return os;
+	}
+};

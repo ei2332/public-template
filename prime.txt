@@ -1,0 +1,78 @@
+void eratos(vector<bool>&x,long long n){
+	x[0] = x[1] = 0;
+	for(long long i = 2;i * i <= n;i++){
+		if(x[i] == 0)continue;
+		for(long long j = i * i;j <= n;j += i){
+			x[j] = 0;
+		}
+	}
+}
+long long ruijo(long long x,long long y,long long mod=0){
+    long long z=1;
+    while(y != 0){
+        if(y & 1)z*=x;
+        y = (y>>1);
+        x*=x;
+		if(mod != 0){
+			x %= mod;
+			z %= mod;
+		}
+    }
+    return z;
+}
+bool millerRabin(long long n){
+	if(n < 2)return false;
+	if(n == 2||n == 3)return true;
+	if(n % 2 == 0)return false;
+
+	long long d = n-1;
+	int s = 0;
+	while(d % 2 == 0){
+		d /= 2;
+		s++;
+	}
+	vector<long long>witnesses;
+	if(n < 4759123141){
+		witnesses = {2,7,61};
+	}else if(n < 341550071728321){
+		witnesses = {2,3,5,7,11,13,17};
+	}else{
+		witnesses ={2, 325, 9375, 28178, 450775, 9780504, 1795265022};
+	}
+	for (long long a : witnesses) {
+        if (a >= n) continue;
+        long long x = ruijo(a, d, n);
+        if (x == 1 || x == n - 1) continue;
+        
+        bool isPrime = false;
+        for (int r = 0; r < s-1; r++) {
+            x = x * x % n;
+            if (x == n - 1) {
+                isPrime = true;
+                break;
+            }
+        }
+		if (!isPrime) return false;
+	}
+	return true;
+}
+
+vector<long long> prime_factorize(long long N) {
+    vector<long long> res;
+    for (long long a = 2; a * a <= N; ++a) {
+        if (N % a != 0) continue;
+        long long ex = 0; // sisuu
+        // genkaimadewaru
+        while (N % a == 0) {
+            ++ex;
+            N /= a;
+        }
+        // ans is push
+        for(int i = 0;i < ex;i++){
+        res.push_back(a);
+        }
+    }
+    // last number
+    if (N != 1) res.push_back(N);
+    return res;
+}
